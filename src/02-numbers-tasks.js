@@ -50,7 +50,8 @@ function getCircleCircumference(radius) {
  *  -3, 3  => 0
  */
 function getAverage(num1, num2) {
-  return (num1 + num2) / 2;
+  const average = (num1 + num2) / 2;
+  return Number.isFinite(average) ? average : Number.MAX_VALUE;
 }
 
 /**
@@ -177,7 +178,7 @@ function getParallelepipedDiagonal(a, b, c) {
  */
 function roundToPowerOfTen(num, pow) {
   if (pow === 0) return num;
-  return parseFloat((num / 10 ** (pow + 1)).toFixed(pow) * 10 ** (pow + 1));
+  return Math.round(num / 10 ** pow) * 10 ** pow;
 }
 
 /**
@@ -199,7 +200,15 @@ function roundToPowerOfTen(num, pow) {
  */
 function isPrime(n) {
   if (n < 4) return true;
-  return !(n % 2 === 0 || n % 3 === 0);
+
+  let i = 2;
+  while (i <= n / 2) {
+    if (n % i === 0) {
+      return false;
+    }
+    i += 1;
+  }
+  return true;
 }
 
 /**
