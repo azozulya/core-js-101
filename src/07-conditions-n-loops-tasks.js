@@ -161,8 +161,12 @@ function doRectanglesOverlap(rect1, rect2) {
  *   { center: { x:0, y:0 }, radius:10 },  { x:10, y:10 }   => false
  *
  */
-function isInsideCircle(/* circle, point */) {
-  throw new Error('Not implemented');
+function isInsideCircle(circle, point) {
+  return (
+    Math.sqrt(
+      (point.x - circle.center.x) ** 2 + (point.y - circle.center.y) ** 2,
+    ) < circle.radius
+  );
 }
 
 /**
@@ -176,8 +180,18 @@ function isInsideCircle(/* circle, point */) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  const chars = new Set([...str]);
+  let result = null;
+
+  [...chars].every((char) => {
+    if (str.match(new RegExp(char, 'g')).length === 1) {
+      result = char;
+      return false;
+    }
+    return true;
+  });
+  return result;
 }
 
 /**
@@ -202,8 +216,12 @@ function findFirstSingleChar(/* str */) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  let result = '';
+  result += isStartIncluded ? '[' : '(';
+  result += a < b ? `${a}, ${b}` : `${b}, ${a}`;
+  result += isEndIncluded ? ']' : ')';
+  return result;
 }
 
 /**
@@ -218,8 +236,8 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
 
 /**
@@ -234,8 +252,8 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return Number(num.toString().split('').reverse().join(''));
 }
 
 /**
@@ -258,8 +276,19 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const totalSum = ccn
+    .toString()
+    .split('')
+    .reverse()
+    .reduce((acc, n, idx) => {
+      let num = idx % 2 === 0 ? Number(n) : Number(n) * 2;
+      if (num > 9) {
+        num -= 9;
+      }
+      return acc + num;
+    }, 0);
+  return totalSum % 10 === 0;
 }
 
 /**
@@ -276,8 +305,12 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const totalSum = num
+    .toString()
+    .split('')
+    .reduce((sum, n) => sum + Number(n), 0);
+  return totalSum > 9 ? getDigitalRoot(totalSum) : totalSum;
 }
 
 /**
@@ -301,8 +334,33 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  if (!str.length) return true;
+
+  const result = [];
+  const brackets = {
+    '[': ']',
+    '(': ')',
+    '{': '}',
+    '<': '>',
+  };
+
+  let i = 0;
+  const arr = str.split('');
+
+  while (i < arr.length) {
+    const item = arr[i];
+
+    if (brackets[item]) {
+      result.push(item);
+    } else {
+      const current = result.pop();
+      if (!current || brackets[current] !== item) return false;
+    }
+    i += 1;
+  }
+
+  return result.length === 0;
 }
 
 /**
@@ -325,8 +383,8 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  return num.toString(n);
 }
 
 /**
@@ -341,8 +399,23 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  let pattern = pathes.pop();
+  const res = new Set();
+
+  if (pattern.startsWith('/')) res.add('/');
+
+  pattern = pattern.split(/(\/\w*)(?=\/)/);
+
+  pathes.forEach((item) => {
+    pattern.forEach((searchStr) => {
+      if (searchStr && item.includes(searchStr)) res.add(searchStr);
+    });
+  });
+
+  return `${[...res].join('').replace('//', '/')}${
+    [...res].length > 1 ? '/' : ''
+  }`;
 }
 
 /**
@@ -363,8 +436,25 @@ function getCommonDirectoryPath(/* pathes */) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
+function getMatrixProduct(m1, m2) {
+  const result = [];
+
+  m1.forEach((arr) => {
+    const row = arr;
+    const resultRow = [];
+
+    for (let i = 0; i < m1.length; i += 1) {
+      let item = 0;
+
+      for (let j = 0; j < m1[i].length; j += 1) {
+        item += row[j] * m2[j][i];
+      }
+      resultRow.push(item);
+    }
+    result.push(resultRow);
+  });
+
+  return result;
 }
 
 /**
@@ -397,8 +487,36 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  const arrPosition = position
+    .map((arr) => {
+      if (arr.length < 3) {
+        const newArr = [...arr];
+        newArr.push(undefined);
+        return newArr;
+      }
+      return arr;
+    })
+    .flat();
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const [a, b, c] = lines[i];
+    const str = `${arrPosition[a]}${arrPosition[b]}${arrPosition[c]}`;
+
+    if (str === 'XXX' || str === '000') return arrPosition[a];
+  }
+  return undefined;
 }
 
 module.exports = {
