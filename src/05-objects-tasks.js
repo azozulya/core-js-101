@@ -50,8 +50,8 @@ function getJSON(obj) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/*proto, json*/) {
-  throw new
+function fromJSON(/* proto, json */) {
+  // throw new
 }
 
 /**
